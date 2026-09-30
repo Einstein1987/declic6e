@@ -55,3 +55,14 @@ body {
     border-color: #0f172a !important;
   }
 }
+/* Curseur clignotant du terminal de briefing */
+.typing-cursor::after {
+  content: '▋';
+  color: #22d3ee;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
