@@ -29,6 +29,7 @@ function updateKeyboardIndicators(e) {
   if (isCaps !== state.isCapsLocked) {
     state.isCapsLocked = isCaps;
     if (state.isCapsLocked) {
+      missionScore = Math.max(200, missionScore - 25); // Pénalité cadenas
       capsWarning.classList.remove('hidden');
       footerCaps.className = "px-2.5 py-0.5 rounded bg-red-950 border border-red-600 text-red-400 font-bold animate-pulse";
       footerCaps.textContent = "ACTIVÉ (DANGER)";
@@ -298,6 +299,19 @@ inputPwd.addEventListener('input', () => {
 });
 
 btnValiderPorte.addEventListener('click', () => {
+  stopMissionTimer();
+
+  const mins = String(Math.floor(missionSeconds / 60)).padStart(2, '0');
+  const secs = String(missionSeconds % 60).padStart(2, '0');
+  document.getElementById('diploma-time').textContent = `${mins}:${secs}`;
+
+  let rankText = "⭐⭐⭐ Agent d'Élite";
+  if (missionScore < 700) {
+    rankText = "⭐ Agent Opérationnel";
+  } else if (missionScore < 900) {
+    rankText = "⭐⭐ Agent Confirmé";
+  }
+  document.getElementById('diploma-rank').textContent = rankText;
   window.audio.playVaultUnlock();
   btnValiderPorte.textContent = "OUVERTURE DU SAS...";
   
@@ -408,4 +422,67 @@ btnModalDisconnect.addEventListener('click', () => {
     document.getElementById('case-panel').classList.add('hidden');
     document.getElementById('lvl2-final-panel').classList.remove('hidden');
   }
+});
+// ----------------------------------------------------
+// GESTION DU CHRONOMÈTRE ET DU SCORE DE PRÉCISION
+// ----------------------------------------------------
+let missionSeconds = 0;
+let timerInterval = null;
+let missionScore = 1000;
+
+function startMissionTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    missionSeconds++;
+    const mins = String(Math.floor(missionSeconds / 60)).padStart(2, '0');
+    const secs = String(missionSeconds % 60).padStart(2, '0');
+    const display = `${mins}:${secs}`;
+    const hudTimer = document.getElementById('hud-timer');
+    if (hudTimer) hudTimer.textContent = display;
+  }, 1000);
+}
+
+function stopMissionTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+// ----------------------------------------------------
+// ANIMATION DU BRIEFING DÉPART (TYPEWRITER)
+// ----------------------------------------------------
+const briefingMessage = "TRANSMISSION CRYPTÉE...\n\nRecrue de CM2 détectée. Ta mission : infiltrer les terminaux du collège, maîtriser ton clavier sans bloquer le cadenas et forger ton habilitation sécurisée.\n\nPremière épreuve : forcer le sas d'entrée par double-clic.";
+
+const typewriterBox = document.getElementById('typewriter-text');
+const btnStartMission = document.getElementById('btn-start-mission');
+const modalBriefing = document.getElementById('modal-briefing');
+
+let charIndex = 0;
+let typingTimeout = null;
+
+function typeWriter() {
+  if (charIndex < briefingMessage.length) {
+    const char = briefingMessage.charAt(charIndex);
+    typewriterBox.textContent += char;
+    charIndex++;
+    if (char !== ' ' && char !== '\n' && window.audio) {
+      window.audio.playClick();
+    }
+    typingTimeout = setTimeout(typeWriter, char === '\n' ? 250 : 25);
+  } else {
+    typewriterBox.classList.remove('typing-cursor');
+  }
+}
+
+// Lancement au chargement
+window.addEventListener('DOMContentLoaded', () => {
+  typeWriter();
+});
+
+btnStartMission.addEventListener('click', () => {
+  if (typingTimeout) clearTimeout(typingTimeout);
+  if (window.audio) window.audio.playDoubleSuccess();
+  modalBriefing.classList.add('hidden');
+  startMissionTimer();
 });
