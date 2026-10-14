@@ -313,10 +313,33 @@ const lockUpper = document.getElementById('lock-upper');
 const lockNum = document.getElementById('lock-num');
 const lockSpecial = document.getElementById('lock-special');
 
+const aidePhraseBox = document.getElementById('aide-phrase-box');
+const aidePhraseCode = document.getElementById('aide-phrase-code');
+const aidePhraseExplication = document.getElementById('aide-phrase-explication');
+
+const modelesIdees = [
+  { texte: "Phrase : « J'aime la physique à 16h ! » — Tape ce code au clavier :", code: "J'aimeLaPhysique16h!" },
+  { texte: "Phrase : « Vive les vacances en 6e ! » — Tape ce code au clavier :", code: "ViveLesVacancesEn6e!" },
+  { texte: "Phrase : « Mon collège est super à 100% ! » — Tape ce code au clavier :", code: "MonCollegeSuper100!" }
+];
+let ideeIndex = 0;
+
 btnAidePhrase.addEventListener('click', () => {
-  inputPwd.value = "J'aimeLaPhysique16h!";
-  inputPwd.dispatchEvent(new Event('input'));
   window.audio.playLockTick();
+  const idee = modelesIdees[ideeIndex % modelesIdees.length];
+  ideeIndex++;
+
+  aidePhraseExplication.textContent = idee.texte;
+  aidePhraseCode.textContent = idee.code;
+  aidePhraseBox.classList.remove('hidden');
+  
+  // On place le curseur dans le champ vide pour que l'élève tape lui-même
+  inputPwd.focus();
+});
+
+// Empêche le copier-coller dans le champ mot de passe pour obliger la frappe réelle
+inputPwd.addEventListener('paste', (e) => {
+  e.preventDefault();
 });
 
 togglePwdBtn.addEventListener('click', () => {
