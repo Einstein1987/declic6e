@@ -1,9 +1,14 @@
-// Dossiers d'enquête du Niveau 2 : Défi Alerte Cyber
+// Calcul global de l'année de la prochaine rentrée (Septembre-Décembre => N+1, Janvier-Août => N)
+const nowForCases = new Date();
+const currentMonthForCases = nowForCases.getMonth() + 1;
+window.promoYear = (currentMonthForCases >= 9) ? nowForCases.getFullYear() + 1 : nowForCases.getFullYear();
+
+// Dossiers d'enquête du Niveau 2 : Défi Alerte Cyber (Sans prénoms commençant par L ou I)
 const cases = [
   {
     id: 1,
-    nom: 'Léa BERNARD',
-    targetId: 'l.bernard',
+    nom: 'Chloé BERNARD',
+    targetId: 'c.bernard',
     targetPwd: 'SoleilMatin99!',
     badgeId: 'case-status-1',
     tabId: 'tab-case-1',
@@ -15,7 +20,7 @@ const cases = [
         </span>
         <div class="text-xs">
           <span class="text-slate-600 block">Identifiant :</span>
-          <strong class="font-code text-sm text-slate-900 bg-amber-100 px-1.5 py-0.5 rounded">l.bernard</strong>
+          <strong class="font-code text-sm text-slate-900 bg-amber-100 px-1.5 py-0.5 rounded">c.bernard</strong>
         </div>
         <div class="text-xs">
           <span class="text-slate-600 block">Mot de passe :</span>
@@ -23,33 +28,33 @@ const cases = [
         </div>
       </div>
       <div class="text-xs text-slate-300 space-y-2">
-        <h4 class="font-hud font-bold text-white text-base">Dossier A &bull; Léa BERNARD</h4>
-        <p>Léa avait peur d'oublier ses codes. Elle a tout écrit sur un papier jaune collé directement au bord de son écran.</p>
+        <h4 class="font-hud font-bold text-white text-base">Dossier A &bull; Chloé BERNARD</h4>
+        <p>Chloé avait peur d'oublier ses codes. Elle a tout écrit sur un papier jaune collé directement au bord de son écran.</p>
         <p class="text-amber-300 font-hud">👉 Recopie son identifiant et son mot de passe pour tester la faille.</p>
       </div>
     `
   },
   {
     id: 2,
-    nom: 'Lucas PETIT',
-    targetId: 'l.petit',
-    targetPwd: 'MonChienRex2015!',
+    nom: 'Maxime PETIT',
+    targetId: 'm.petit',
+    targetPwd: `MonChienRex${window.promoYear}!`,
     badgeId: 'case-status-2',
     tabId: 'tab-case-2',
-    lesson: "RÈGLE D'OR : N'utilise JAMAIS d'informations personnelles (nom de ton animal, année de naissance). Tes camarades les connaissent et peuvent deviner ton code !",
+    lesson: "RÈGLE D'OR : N'utilise JAMAIS d'informations faciles à deviner (nom de ton animal, année de la rentrée). Tes camarades les connaissent !",
     evidenceHtml: `
       <div class="p-4 bg-slate-900 border border-purple-500/50 rounded-xl max-w-sm shrink-0 space-y-2">
         <span class="text-xs font-hud font-bold text-purple-300 uppercase block">
           📖 Pense-bête au dos de son cahier :
         </span>
         <p class="text-xs text-slate-200 italic bg-slate-950 p-3 rounded-lg border border-slate-800 leading-relaxed">
-          « Pour mon code secret, j'ai écrit <strong class="text-yellow-300 not-italic font-code">MonChien</strong>, puis le prénom de mon toutou <strong class="text-yellow-300 not-italic font-code">Rex</strong>, mon année de naissance <strong class="text-yellow-300 not-italic font-code">2015</strong> et un <strong class="text-yellow-300 not-italic font-code">!</strong> à la fin. »
+          « Pour mon code secret, j'ai écrit <strong class="text-yellow-300 not-italic font-code">MonChien</strong>, puis le prénom de mon toutou <strong class="text-yellow-300 not-italic font-code">Rex</strong>, l'année de la rentrée <strong class="text-yellow-300 not-italic font-code">${window.promoYear}</strong> et un <strong class="text-yellow-300 not-italic font-code">!</strong> à la fin. »
         </p>
       </div>
       <div class="text-xs text-slate-300 space-y-2">
-        <h4 class="font-hud font-bold text-white text-base">Dossier B &bull; Lucas PETIT</h4>
-        <p>Lucas pensait être protégé avec 16 caractères, mais tout est basé sur sa vie privée que tout le monde connaît.</p>
-        <p class="text-cyan-400 font-mono">Format identifiant : <strong>l.petit</strong></p>
+        <h4 class="font-hud font-bold text-white text-base">Dossier B &bull; Maxime PETIT</h4>
+        <p>Maxime pensait être protégé avec 16 caractères, mais tout est basé sur des informations que tout le monde connaît.</p>
+        <p class="text-cyan-400 font-mono">Format identifiant : <strong>m.petit</strong></p>
         <p class="text-purple-300 font-hud">👉 Reconstitue son mot de passe en attachant les mots de son pense-bête.</p>
       </div>
     `
