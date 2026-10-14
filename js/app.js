@@ -41,7 +41,7 @@ function stopMissionTimer() {
 // ----------------------------------------------------
 // ANIMATION DU BRIEFING DÉPART (TYPEWRITER)
 // ----------------------------------------------------
-const briefingMessage = "TRANSMISSION CRYPTÉE...\n\nRecrue de CM2 détectée. Ta mission : infiltrer les terminaux du collège, maîtriser ton clavier sans bloquer le cadenas et forger ton habilitation sécurisée.\n\nPremière épreuve : forcer le sas d'entrée par double-clic.";
+const briefingMessage = "TRANSMISSION CRYPTÉE...\n\nRecrue de CM2 détectée. Ta mission : infiltrer les terminaux du collège, maîtriser ton clavier sans bloquer le cadenas et forger ton habilitation sécurisée.\n\n⚠️ Règle n°1 d'un bon agent : LIS BIEN LES CONSIGNES à chaque étape !\n\nPremière épreuve : forcer le sas d'entrée par double-clic.";
 
 const typewriterBox = document.getElementById('typewriter-text');
 const btnStartMission = document.getElementById('btn-start-mission');
@@ -299,7 +299,7 @@ inputP2.addEventListener('input', () => {
   }
 });
 
-// Palier 3 (Coffre complet - Sans espace autorisé comme caractère spécial)
+// Palier 3 (Coffre complet)
 const inputPwd = document.getElementById('input-password');
 const togglePwdBtn = document.getElementById('toggle-pwd-btn');
 const charCountText = document.getElementById('char-count-text');
@@ -341,7 +341,6 @@ inputPwd.addEventListener('input', () => {
   const val = inputPwd.value;
   const hasSpace = /\s/.test(val);
 
-  // Alerte si l'élève met un espace
   if (hasSpace) {
     pwdSpaceWarning.classList.remove('hidden');
     window.audio.playWarning();
@@ -349,7 +348,6 @@ inputPwd.addEventListener('input', () => {
     pwdSpaceWarning.classList.add('hidden');
   }
 
-  // On compte la longueur hors espaces
   const cleanLen = val.replace(/\s/g, '').length;
   charCountText.textContent = `${cleanLen} / 12 caractères`;
   progressBar.style.width = `${Math.min(100, Math.round((cleanLen / 12) * 100))}%`;
@@ -357,7 +355,6 @@ inputPwd.addEventListener('input', () => {
   const isLenValid = cleanLen >= 12 && !hasSpace;
   const hasUpper = /[A-Z]/.test(val);
   const hasNumber = /[0-9]/.test(val);
-  // Caractère spécial : ni lettre, ni chiffre, NI ESPACE (\s)
   const hasSpecial = /[^A-Za-z0-9\s]/.test(val);
 
   setLockState(lockLen, isLenValid);
@@ -400,6 +397,7 @@ btnValiderPorte.addEventListener('click', () => {
     document.getElementById('diploma-promo').textContent = `PROMO ${promoYear}`;
     document.getElementById('diploma-nom').textContent = `${state.prenom} ${state.nom}`;
     document.getElementById('diploma-matricule').textContent = state.targetIdentifiant;
+    updateDiplomaCyberStatus();
   }, 1000);
 });
 
@@ -408,22 +406,46 @@ document.getElementById('btn-print').addEventListener('click', () => window.prin
 document.getElementById('btn-restart').addEventListener('click', () => window.location.reload());
 
 // ----------------------------------------------------
-// NIVEAU 2 : DÉFI ALERTE CYBER
+// NIVEAU 2 : DÉFI ALERTE CYBER (AVEC RETOUR AUX DOSSIERS & BILAN BREVET)
 // ----------------------------------------------------
 const btnStartLvl2 = document.getElementById('btn-start-lvl2');
 const phaseLvl2 = document.getElementById('phase-lvl2');
 const phase3 = document.getElementById('phase-3');
 const btnBackDiploma = document.getElementById('btn-back-diploma');
+const btnBackDiplomaFromGrid = document.getElementById('btn-back-diploma-grid');
+
+const casesGridContainer = document.getElementById('cases-grid-container');
+const casePanel = document.getElementById('case-panel');
+const btnBackToCases = document.getElementById('btn-back-to-cases');
 
 const lvl2InputId = document.getElementById('lvl2-input-id');
 const lvl2InputPwd = document.getElementById('lvl2-input-pwd');
 const toggleLvl2PwdBtn = document.getElementById('toggle-lvl2-pwd-btn');
 const lvl2ErrorFeedback = document.getElementById('lvl2-error-feedback');
+const btnCaseHint = document.getElementById('btn-case-hint');
+const caseHintBox = document.getElementById('case-hint-box');
 
 let currentCaseIndex = 0;
+let currentCaseAttempts = 0;
 const resolvedCases = [false, false, false];
 
-// Bouton oeil pour le mot de passe du Niveau 2
+function updateDiplomaCyberStatus() {
+  const totalResolved = resolvedCases.filter(Boolean).length;
+  const diplomaCyberEl = document.getElementById('diploma-cyber-status');
+  if (!diplomaCyberEl) return;
+
+  if (totalResolved === 0) {
+    diplomaCyberEl.textContent = "Non effectué (Optionnel)";
+    diplomaCyberEl.className = "font-hud text-sm font-bold text-slate-400";
+  } else if (totalResolved < 3) {
+    diplomaCyberEl.textContent = `${totalResolved} / 3 Dossiers sécurisés`;
+    diplomaCyberEl.className = "font-hud text-sm font-bold text-cyan-300";
+  } else {
+    diplomaCyberEl.textContent = "🏆 3 / 3 — Gardien Cyber Validé !";
+    diplomaCyberEl.className = "font-hud text-sm font-bold text-emerald-400";
+  }
+}
+
 if (toggleLvl2PwdBtn) {
   toggleLvl2PwdBtn.addEventListener('click', () => {
     window.audio.playClick();
@@ -432,32 +454,48 @@ if (toggleLvl2PwdBtn) {
   });
 }
 
+// Affiche la grille des 3 dossiers
+function showCasesSelectionGrid() {
+  casePanel.classList.add('hidden');
+  casesGridContainer.classList.remove('hidden');
+}
+
 btnStartLvl2.addEventListener('click', () => {
   window.audio.playDoubleSuccess();
   phase3.classList.add('hidden');
   phaseLvl2.classList.remove('hidden');
-  loadCase(0);
+  showCasesSelectionGrid();
 });
 
 btnBackDiploma.addEventListener('click', () => {
+  updateDiplomaCyberStatus();
   phaseLvl2.classList.add('hidden');
   phase3.classList.remove('hidden');
 });
 
-function loadCase(index) {
+if (btnBackDiplomaFromGrid) {
+  btnBackDiplomaFromGrid.addEventListener('click', () => {
+    updateDiplomaCyberStatus();
+    phaseLvl2.classList.add('hidden');
+    phase3.classList.remove('hidden');
+  });
+}
+
+if (btnBackToCases) {
+  btnBackToCases.addEventListener('click', () => {
+    window.audio.playClick();
+    showCasesSelectionGrid();
+  });
+}
+
+// Charge un dossier spécifique et masque la grille pour se concentrer dessus
+function openCase(index) {
   currentCaseIndex = index;
+  currentCaseAttempts = 0;
   const c = cases[index];
 
-  cases.forEach((item, i) => {
-    const tab = document.getElementById(item.tabId);
-    if (i === index) {
-      tab.classList.add('border-purple-500', 'border-2');
-      tab.classList.remove('border-slate-800');
-    } else {
-      tab.classList.remove('border-purple-500', 'border-2');
-      tab.classList.add('border-slate-800');
-    }
-  });
+  casesGridContainer.classList.add('hidden');
+  casePanel.classList.remove('hidden');
 
   document.getElementById('case-evidence-box').innerHTML = c.evidenceHtml;
   lvl2InputId.value = '';
@@ -465,22 +503,32 @@ function loadCase(index) {
   lvl2InputPwd.type = 'password';
   toggleLvl2PwdBtn.classList.remove('text-purple-400');
   lvl2ErrorFeedback.classList.add('hidden');
+  btnCaseHint.classList.add('hidden');
+  caseHintBox.classList.add('hidden');
   lvl2InputId.focus();
 }
 
 cases.forEach((c, i) => {
   document.getElementById(c.tabId).addEventListener('click', () => {
     window.audio.playClick();
-    loadCase(i);
+    openCase(i);
   });
 });
+
+if (btnCaseHint) {
+  btnCaseHint.addEventListener('click', () => {
+    window.audio.playLockTick();
+    const activeCase = cases[currentCaseIndex];
+    caseHintBox.innerHTML = `💡 <strong>Indice :</strong> ${activeCase.hint}`;
+    caseHintBox.classList.remove('hidden');
+  });
+}
 
 const btnTestLogin = document.getElementById('btn-lvl2-test-login');
 const modalLegal = document.getElementById('modal-legal-warning');
 const btnModalDisconnect = document.getElementById('btn-modal-disconnect');
 const legalLessonText = document.getElementById('legal-lesson-text');
 
-// Diagnostic précis en cas d'erreur sur l'identifiant, le mot de passe ou les deux
 btnTestLogin.addEventListener('click', () => {
   const activeCase = cases[currentCaseIndex];
   const typedId = lvl2InputId.value.trim().toLowerCase();
@@ -495,11 +543,17 @@ btnTestLogin.addEventListener('click', () => {
     legalLessonText.textContent = activeCase.lesson;
     modalLegal.classList.remove('hidden');
   } else {
+    currentCaseAttempts++;
     window.audio.playWarning();
     lvl2ErrorFeedback.classList.remove('hidden');
 
+    // Au bout de 2 essais infructueux, on affiche le bouton Coup de pouce
+    if (currentCaseAttempts >= 2) {
+      btnCaseHint.classList.remove('hidden');
+    }
+
     if (!idOk && !pwdOk) {
-      lvl2ErrorFeedback.innerHTML = "❌ <strong>L'identifiant ET le mot de passe sont incorrects.</strong> Regarde bien les indices du dossier et utilise l'œil 👁️ pour vérifier !";
+      lvl2ErrorFeedback.innerHTML = "❌ <strong>L'identifiant ET le mot de passe sont incorrects.</strong> Lis bien les indices du dossier et utilise l'œil 👁️ pour vérifier !";
     } else if (!idOk) {
       lvl2ErrorFeedback.innerHTML = "❌ <strong>Mauvais identifiant !</strong> Vérifie bien l'orthographe (initiale.nom en minuscules).";
     } else {
@@ -519,13 +573,14 @@ btnModalDisconnect.addEventListener('click', () => {
 
   const totalResolved = resolvedCases.filter(Boolean).length;
   document.getElementById('lvl2-score-badge').textContent = `Défis résolus : ${totalResolved} / 3`;
+  updateDiplomaCyberStatus();
 
-  const nextUnsolved = resolvedCases.findIndex(r => !r);
-  if (nextUnsolved !== -1) {
-    loadCase(nextUnsolved);
+  if (totalResolved < 3) {
+    showCasesSelectionGrid();
   } else {
     window.audio.playDoubleSuccess();
-    document.getElementById('case-panel').classList.add('hidden');
+    casePanel.classList.add('hidden');
+    casesGridContainer.classList.add('hidden');
     document.getElementById('lvl2-final-panel').classList.remove('hidden');
   }
 });
