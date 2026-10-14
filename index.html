@@ -641,8 +641,10 @@
 
   </main>
 
-  <!-- PIED DE PAGE : SURVEILLANCE CLAVIER -->
-  <footer class="border-t border-slate-800/80 bg-slate-950/80 px-4 py-3 text-center no-print">
+<!-- PIED DE PAGE : SURVEILLANCE CLAVIER & SIGNATURE DÉVELOPPEUR -->
+  <footer class="border-t border-slate-800/80 bg-slate-950/90 px-4 py-4 text-center no-print space-y-3">
+    
+    <!-- Ligne 1 : Voyants Clavier en temps réel -->
     <div class="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-6 text-xs font-code text-slate-400">
       <div class="flex items-center gap-2">
         <span class="text-slate-500">Touche Shift :</span>
@@ -656,6 +658,37 @@
           Éteint (Correct)
         </span>
       </div>
+    </div>
+
+    <!-- Ligne 2 : Volet déroulant Confidentialité + Capsule Signature -->
+    <div class="max-w-2xl mx-auto pt-2 border-t border-slate-900 flex flex-col items-center gap-2">
+      
+      <details class="text-xs text-slate-400 cursor-pointer group">
+        <summary class="font-hud font-semibold text-cyan-400 hover:text-cyan-300 transition select-none">
+          Confidentialité & RGPD
+        </summary>
+        <p class="mt-2 p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-[11px] text-slate-300 max-w-lg mx-auto leading-relaxed">
+          <strong>100 % Local & Conforme RGPD :</strong> Cette application s'exécute intégralement dans le navigateur de l'élève. Aucun nom, prénom, mot de passe ou résultat n'est envoyé sur Internet ni stocké sur un serveur ou dans une base de données.
+        </p>
+      </details>
+
+      <!-- Capsule Signature style Jérémy VIOLETTE -->
+      <div class="inline-flex items-center gap-3 bg-slate-900/90 border border-slate-800 px-5 py-2 rounded-full shadow-md text-xs text-slate-300">
+        <!-- Remplace "avatar.png" par le chemin de ton Bitmoji -->
+        <img src="avatar.png" alt="Jérémy VIOLETTE" class="w-7 h-7 rounded-full object-cover bg-slate-800" onerror="this.style.display='none'">
+        <span>
+          Développé par <strong class="text-white font-semibold">Jérémy VIOLETTE</strong>
+          &bull;
+          <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">
+            Licence GNU AGPL v3.0
+          </a>
+          &bull;
+          <a href="https://github.com/jeremyviolette/declic6e" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">
+            Code source
+          </a>
+        </span>
+      </div>
+
     </div>
   </footer>
 
