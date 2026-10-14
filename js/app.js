@@ -1,8 +1,6 @@
 // Logique métier et navigation
 const nowDate = new Date();
-const currentMonth = nowDate.getMonth() + 1;
-const currentYear = nowDate.getFullYear();
-const promoYear = (currentMonth >= 9) ? currentYear + 1 : currentYear;
+const promoYear = window.promoYear || ((nowDate.getMonth() + 1 >= 9) ? nowDate.getFullYear() + 1 : nowDate.getFullYear());
 const randomDynamicDigits = String(nowDate.getSeconds()).padStart(2, '0');
 
 const state = {
@@ -14,6 +12,71 @@ const state = {
   isCapsLocked: false,
   isShiftPressed: false
 };
+
+// ----------------------------------------------------
+// GESTION DU CHRONOMÈTRE ET DU SCORE DE PRÉCISION
+// ----------------------------------------------------
+let missionSeconds = 0;
+let timerInterval = null;
+let missionScore = 1000;
+
+function startMissionTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    missionSeconds++;
+    const mins = String(Math.floor(missionSeconds / 60)).padStart(2, '0');
+    const secs = String(missionSeconds % 60).padStart(2, '0');
+    const hudTimer = document.getElementById('hud-timer');
+    if (hudTimer) hudTimer.textContent = `${mins}:${secs}`;
+  }, 1000);
+}
+
+function stopMissionTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+// ----------------------------------------------------
+// ANIMATION DU BRIEFING DÉPART (TYPEWRITER)
+// ----------------------------------------------------
+const briefingMessage = "TRANSMISSION CRYPTÉE...\n\nRecrue de CM2 détectée. Ta mission : infiltrer les terminaux du collège, maîtriser ton clavier sans bloquer le cadenas et forger ton habilitation sécurisée.\n\nPremière épreuve : forcer le sas d'entrée par double-clic.";
+
+const typewriterBox = document.getElementById('typewriter-text');
+const btnStartMission = document.getElementById('btn-start-mission');
+const modalBriefing = document.getElementById('modal-briefing');
+
+let charIndex = 0;
+let typingTimeout = null;
+
+function typeWriter() {
+  if (!typewriterBox) return;
+  if (charIndex < briefingMessage.length) {
+    const char = briefingMessage.charAt(charIndex);
+    typewriterBox.textContent += char;
+    charIndex++;
+    if (char !== ' ' && char !== '\n' && window.audio && window.audio.ctx) {
+      window.audio.playClick();
+    }
+    typingTimeout = setTimeout(typeWriter, char === '\n' ? 250 : 25);
+  } else {
+    typewriterBox.classList.remove('typing-cursor');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  typeWriter();
+});
+
+if (btnStartMission) {
+  btnStartMission.addEventListener('click', () => {
+    if (typingTimeout) clearTimeout(typingTimeout);
+    window.audio.playDoubleSuccess();
+    modalBriefing.classList.add('hidden');
+    startMissionTimer();
+  });
+}
 
 function sanitizeForLogin(str) {
   return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, "");
@@ -29,7 +92,7 @@ function updateKeyboardIndicators(e) {
   if (isCaps !== state.isCapsLocked) {
     state.isCapsLocked = isCaps;
     if (state.isCapsLocked) {
-      missionScore = Math.max(200, missionScore - 25); // Pénalité cadenas
+      missionScore = Math.max(200, missionScore - 25);
       capsWarning.classList.remove('hidden');
       footerCaps.className = "px-2.5 py-0.5 rounded bg-red-950 border border-red-600 text-red-400 font-bold animate-pulse";
       footerCaps.textContent = "ACTIVÉ (DANGER)";
@@ -44,10 +107,10 @@ function updateKeyboardIndicators(e) {
   state.isShiftPressed = e.shiftKey;
   if (state.isShiftPressed) {
     footerShift.className = "px-2.5 py-0.5 rounded bg-cyan-900 border border-cyan-400 text-cyan-200 font-bold glow-cyan";
-    footerShift.textContent = "[ ACTIVÉE ]";
+    footerShift.textContent = "[ ⇧ ACTIVÉE ]";
   } else {
     footerShift.className = "px-2.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-400 font-bold";
-    footerShift.textContent = "[ Relâchée ]";
+    footerShift.textContent = "[ ⇧ Relâchée ]";
   }
 }
 
@@ -166,6 +229,7 @@ inputSaisieId.addEventListener('input', () => {
     statusIconId.innerHTML = `<svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`;
     btnValiderId.disabled = true;
   } else {
+    missionScore = Math.max(200, missionScore - 15);
     inputSaisieId.className = "w-full bg-slate-950 border-2 border-red-500 rounded-xl px-5 py-4 text-2xl font-code tracking-widest text-red-300 focus:outline-none glow-red";
     let expl = "Attention, une touche est incorrecte !";
     if (/[A-Z]/.test(value)) expl = "Pas de majuscule ! Éteins le cadenas [Verr Maj].";
@@ -235,13 +299,14 @@ inputP2.addEventListener('input', () => {
   }
 });
 
-// Palier 3 (Coffre complet)
+// Palier 3 (Coffre complet - Sans espace autorisé comme caractère spécial)
 const inputPwd = document.getElementById('input-password');
 const togglePwdBtn = document.getElementById('toggle-pwd-btn');
 const charCountText = document.getElementById('char-count-text');
 const progressBar = document.getElementById('password-progress-bar');
 const btnValiderPorte = document.getElementById('btn-valider-porte');
 const btnAidePhrase = document.getElementById('btn-aide-phrase');
+const pwdSpaceWarning = document.getElementById('pwd-space-warning');
 
 const lockLen = document.getElementById('lock-len');
 const lockUpper = document.getElementById('lock-upper');
@@ -274,22 +339,33 @@ function setLockState(el, isValid) {
 inputPwd.addEventListener('input', () => {
   window.audio.playClick();
   const val = inputPwd.value;
-  const len = val.length;
+  const hasSpace = /\s/.test(val);
 
-  charCountText.textContent = `${len} / 12 caractères`;
-  progressBar.style.width = `${Math.min(100, Math.round((len / 12) * 100))}%`;
+  // Alerte si l'élève met un espace
+  if (hasSpace) {
+    pwdSpaceWarning.classList.remove('hidden');
+    window.audio.playWarning();
+  } else {
+    pwdSpaceWarning.classList.add('hidden');
+  }
 
-  const isLenValid = len >= 12;
+  // On compte la longueur hors espaces
+  const cleanLen = val.replace(/\s/g, '').length;
+  charCountText.textContent = `${cleanLen} / 12 caractères`;
+  progressBar.style.width = `${Math.min(100, Math.round((cleanLen / 12) * 100))}%`;
+
+  const isLenValid = cleanLen >= 12 && !hasSpace;
   const hasUpper = /[A-Z]/.test(val);
   const hasNumber = /[0-9]/.test(val);
-  const hasSpecial = /[^A-Za-z0-9]/.test(val);
+  // Caractère spécial : ni lettre, ni chiffre, NI ESPACE (\s)
+  const hasSpecial = /[^A-Za-z0-9\s]/.test(val);
 
   setLockState(lockLen, isLenValid);
   setLockState(lockUpper, hasUpper);
   setLockState(lockNum, hasNumber);
   setLockState(lockSpecial, hasSpecial);
 
-  if (isLenValid && hasUpper && hasNumber && hasSpecial) {
+  if (isLenValid && hasUpper && hasNumber && hasSpecial && !hasSpace) {
     btnValiderPorte.disabled = false;
     btnValiderPorte.className = "bg-purple-600 hover:bg-purple-500 text-white font-hud font-bold px-8 py-3.5 rounded-xl transition duration-200 flex items-center gap-3 glow-cyan animate-pulse";
   } else {
@@ -300,18 +376,6 @@ inputPwd.addEventListener('input', () => {
 
 btnValiderPorte.addEventListener('click', () => {
   stopMissionTimer();
-
-  const mins = String(Math.floor(missionSeconds / 60)).padStart(2, '0');
-  const secs = String(missionSeconds % 60).padStart(2, '0');
-  document.getElementById('diploma-time').textContent = `${mins}:${secs}`;
-
-  let rankText = "⭐⭐⭐ Agent d'Élite";
-  if (missionScore < 700) {
-    rankText = "⭐ Agent Opérationnel";
-  } else if (missionScore < 900) {
-    rankText = "⭐⭐ Agent Confirmé";
-  }
-  document.getElementById('diploma-rank').textContent = rankText;
   window.audio.playVaultUnlock();
   btnValiderPorte.textContent = "OUVERTURE DU SAS...";
   
@@ -320,6 +384,18 @@ btnValiderPorte.addEventListener('click', () => {
     document.getElementById('phase-3').classList.remove('hidden');
     document.getElementById('step-pill-2').className = "px-3 py-1 rounded bg-slate-900 text-slate-500 font-bold";
     document.getElementById('step-pill-3').className = "px-3 py-1 rounded bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold";
+
+    const mins = String(Math.floor(missionSeconds / 60)).padStart(2, '0');
+    const secs = String(missionSeconds % 60).padStart(2, '0');
+    document.getElementById('diploma-time').textContent = `${mins}:${secs}`;
+
+    let rankText = "⭐⭐⭐ Agent d'Élite";
+    if (missionScore < 700) {
+      rankText = "⭐ Agent Opérationnel";
+    } else if (missionScore < 900) {
+      rankText = "⭐⭐ Agent Confirmé";
+    }
+    document.getElementById('diploma-rank').textContent = rankText;
 
     document.getElementById('diploma-promo').textContent = `PROMO ${promoYear}`;
     document.getElementById('diploma-nom').textContent = `${state.prenom} ${state.nom}`;
@@ -339,8 +415,22 @@ const phaseLvl2 = document.getElementById('phase-lvl2');
 const phase3 = document.getElementById('phase-3');
 const btnBackDiploma = document.getElementById('btn-back-diploma');
 
+const lvl2InputId = document.getElementById('lvl2-input-id');
+const lvl2InputPwd = document.getElementById('lvl2-input-pwd');
+const toggleLvl2PwdBtn = document.getElementById('toggle-lvl2-pwd-btn');
+const lvl2ErrorFeedback = document.getElementById('lvl2-error-feedback');
+
 let currentCaseIndex = 0;
 const resolvedCases = [false, false, false];
+
+// Bouton oeil pour le mot de passe du Niveau 2
+if (toggleLvl2PwdBtn) {
+  toggleLvl2PwdBtn.addEventListener('click', () => {
+    window.audio.playClick();
+    lvl2InputPwd.type = (lvl2InputPwd.type === 'password') ? 'text' : 'password';
+    toggleLvl2PwdBtn.classList.toggle('text-purple-400');
+  });
+}
 
 btnStartLvl2.addEventListener('click', () => {
   window.audio.playDoubleSuccess();
@@ -370,9 +460,12 @@ function loadCase(index) {
   });
 
   document.getElementById('case-evidence-box').innerHTML = c.evidenceHtml;
-  document.getElementById('lvl2-input-id').value = '';
-  document.getElementById('lvl2-input-pwd').value = '';
-  document.getElementById('lvl2-input-id').focus();
+  lvl2InputId.value = '';
+  lvl2InputPwd.value = '';
+  lvl2InputPwd.type = 'password';
+  toggleLvl2PwdBtn.classList.remove('text-purple-400');
+  lvl2ErrorFeedback.classList.add('hidden');
+  lvl2InputId.focus();
 }
 
 cases.forEach((c, i) => {
@@ -387,18 +480,31 @@ const modalLegal = document.getElementById('modal-legal-warning');
 const btnModalDisconnect = document.getElementById('btn-modal-disconnect');
 const legalLessonText = document.getElementById('legal-lesson-text');
 
+// Diagnostic précis en cas d'erreur sur l'identifiant, le mot de passe ou les deux
 btnTestLogin.addEventListener('click', () => {
   const activeCase = cases[currentCaseIndex];
-  const typedId = document.getElementById('lvl2-input-id').value.trim().toLowerCase();
-  const typedPwd = document.getElementById('lvl2-input-pwd').value.trim();
+  const typedId = lvl2InputId.value.trim().toLowerCase();
+  const typedPwd = lvl2InputPwd.value.trim();
 
-  if (typedId === activeCase.targetId && typedPwd === activeCase.targetPwd) {
+  const idOk = (typedId === activeCase.targetId);
+  const pwdOk = (typedPwd === activeCase.targetPwd);
+
+  if (idOk && pwdOk) {
+    lvl2ErrorFeedback.classList.add('hidden');
     window.audio.playWarning();
     legalLessonText.textContent = activeCase.lesson;
     modalLegal.classList.remove('hidden');
   } else {
     window.audio.playWarning();
-    alert("Identifiant ou mot de passe incorrect ! Regarde bien la fiche d'indices du dossier.");
+    lvl2ErrorFeedback.classList.remove('hidden');
+
+    if (!idOk && !pwdOk) {
+      lvl2ErrorFeedback.innerHTML = "❌ <strong>L'identifiant ET le mot de passe sont incorrects.</strong> Regarde bien les indices du dossier et utilise l'œil 👁️ pour vérifier !";
+    } else if (!idOk) {
+      lvl2ErrorFeedback.innerHTML = "❌ <strong>Mauvais identifiant !</strong> Vérifie bien l'orthographe (initiale.nom en minuscules).";
+    } else {
+      lvl2ErrorFeedback.innerHTML = "❌ <strong>Mauvais mot de passe !</strong> Utilise le petit œil 👁️ à droite du champ pour vérifier les majuscules et les chiffres.";
+    }
   }
 });
 
@@ -422,67 +528,4 @@ btnModalDisconnect.addEventListener('click', () => {
     document.getElementById('case-panel').classList.add('hidden');
     document.getElementById('lvl2-final-panel').classList.remove('hidden');
   }
-});
-// ----------------------------------------------------
-// GESTION DU CHRONOMÈTRE ET DU SCORE DE PRÉCISION
-// ----------------------------------------------------
-let missionSeconds = 0;
-let timerInterval = null;
-let missionScore = 1000;
-
-function startMissionTimer() {
-  if (timerInterval) return;
-  timerInterval = setInterval(() => {
-    missionSeconds++;
-    const mins = String(Math.floor(missionSeconds / 60)).padStart(2, '0');
-    const secs = String(missionSeconds % 60).padStart(2, '0');
-    const display = `${mins}:${secs}`;
-    const hudTimer = document.getElementById('hud-timer');
-    if (hudTimer) hudTimer.textContent = display;
-  }, 1000);
-}
-
-function stopMissionTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-}
-
-// ----------------------------------------------------
-// ANIMATION DU BRIEFING DÉPART (TYPEWRITER)
-// ----------------------------------------------------
-const briefingMessage = "TRANSMISSION CRYPTÉE...\n\nRecrue de CM2 détectée. Ta mission : infiltrer les terminaux du collège, maîtriser ton clavier sans bloquer le cadenas et forger ton habilitation sécurisée.\n\nPremière épreuve : forcer le sas d'entrée par double-clic.";
-
-const typewriterBox = document.getElementById('typewriter-text');
-const btnStartMission = document.getElementById('btn-start-mission');
-const modalBriefing = document.getElementById('modal-briefing');
-
-let charIndex = 0;
-let typingTimeout = null;
-
-function typeWriter() {
-  if (charIndex < briefingMessage.length) {
-    const char = briefingMessage.charAt(charIndex);
-    typewriterBox.textContent += char;
-    charIndex++;
-    if (char !== ' ' && char !== '\n' && window.audio) {
-      window.audio.playClick();
-    }
-    typingTimeout = setTimeout(typeWriter, char === '\n' ? 250 : 25);
-  } else {
-    typewriterBox.classList.remove('typing-cursor');
-  }
-}
-
-// Lancement au chargement
-window.addEventListener('DOMContentLoaded', () => {
-  typeWriter();
-});
-
-btnStartMission.addEventListener('click', () => {
-  if (typingTimeout) clearTimeout(typingTimeout);
-  if (window.audio) window.audio.playDoubleSuccess();
-  modalBriefing.classList.add('hidden');
-  startMissionTimer();
 });
