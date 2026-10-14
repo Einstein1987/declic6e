@@ -433,8 +433,7 @@ document.getElementById('btn-print').addEventListener('click', () => {
   const rang = document.getElementById('diploma-rank').textContent.trim();
   const cyber = document.getElementById('diploma-cyber-status').textContent.trim();
 
-  // Ouverture d'une fenêtre d'impression vierge dédiée uniquement au diplôme
-  const printWindow = window.open('', '_blank', 'width=850,height=650');
+  const printWindow = window.open('', '_blank', 'width=1050,height=750');
   
   printWindow.document.write(`
     <!DOCTYPE html>
@@ -444,9 +443,10 @@ document.getElementById('btn-print').addEventListener('click', () => {
       <title>Brevet d'Aptitude Numérique - ${nom}</title>
       <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=JetBrains+Mono:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
       <style>
+        /* Force automatiquement l'orientation A4 Paysage dans la boîte de dialogue */
         @page {
-          size: A4 portrait;
-          margin: 15mm;
+          size: A4 landscape;
+          margin: 12mm;
         }
         * {
           box-sizing: border-box;
@@ -458,16 +458,21 @@ document.getElementById('btn-print').addEventListener('click', () => {
           background: #ffffff;
           color: #0f172a;
           margin: 0;
-          padding: 20px;
+          padding: 0;
+          height: 100vh;
           display: flex;
+          align-items: center;
           justify-content: center;
         }
         .diploma-box {
           width: 100%;
-          max-width: 720px;
-          border: 4px double #0f172a;
+          max-width: 980px;
+          border: 6px double #0f172a;
           border-radius: 24px;
-          padding: 36px;
+          padding: 36px 48px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
         }
         .header {
           display: flex;
@@ -475,52 +480,63 @@ document.getElementById('btn-print').addEventListener('click', () => {
           align-items: center;
           border-bottom: 2px solid #cbd5e1;
           padding-bottom: 18px;
-          margin-bottom: 24px;
+          margin-bottom: 22px;
         }
         .header-left {
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 16px;
         }
         .badge-6e {
-          width: 52px;
-          height: 52px;
-          border: 2px solid #0f172a;
-          border-radius: 12px;
+          width: 58px;
+          height: 58px;
+          border: 2.5px solid #0f172a;
+          border-radius: 14px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: 'Chakra Petch', sans-serif;
           font-weight: 800;
-          font-size: 22px;
+          font-size: 26px;
           background: #f1f5f9;
         }
         .title-main {
           font-family: 'Chakra Petch', sans-serif;
-          font-size: 20px;
+          font-size: 24px;
           font-weight: 800;
           text-transform: uppercase;
           margin: 0;
+          letter-spacing: 1px;
         }
         .title-sub {
           font-family: 'Chakra Petch', sans-serif;
-          font-size: 13px;
+          font-size: 14px;
           font-weight: 700;
           color: #334155;
-          margin: 2px 0 0 0;
+          margin: 3px 0 0 0;
         }
         .promo-pill {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 13px;
+          font-size: 15px;
           font-weight: 700;
           border: 2px solid #0f172a;
-          padding: 6px 12px;
-          border-radius: 8px;
+          padding: 8px 16px;
+          border-radius: 10px;
           background: #f8fafc;
+        }
+        /* En paysage, on met le Nom et le Matricule côte à côte pour aérer le diplôme */
+        .identity-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+          align-items: center;
+          margin-bottom: 22px;
         }
         .student-block {
           text-align: center;
-          margin: 24px 0;
+          padding: 18px;
+          border: 1px solid #cbd5e1;
+          border-radius: 16px;
         }
         .label-upper {
           font-family: 'Chakra Petch', sans-serif;
@@ -540,16 +556,15 @@ document.getElementById('btn-print').addEventListener('click', () => {
           color: #0f172a;
         }
         .matricule-box {
-          border: 2px solid #0f172a;
+          border: 2.5px solid #0f172a;
           background: #f8fafc;
-          border-radius: 14px;
-          padding: 16px;
+          border-radius: 16px;
+          padding: 18px;
           text-align: center;
-          margin-bottom: 20px;
         }
         .matricule-code {
           font-family: 'JetBrains Mono', monospace;
-          font-size: 26px;
+          font-size: 28px;
           font-weight: 700;
           letter-spacing: 2px;
           color: #0f172a;
@@ -557,39 +572,39 @@ document.getElementById('btn-print').addEventListener('click', () => {
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-          border: 1px solid #94a3b8;
-          border-radius: 14px;
-          padding: 14px;
+          gap: 16px;
+          border: 1.5px solid #94a3b8;
+          border-radius: 16px;
+          padding: 16px;
           text-align: center;
-          margin-bottom: 20px;
+          margin-bottom: 22px;
           background: #ffffff;
         }
         .stat-val {
           font-family: 'Chakra Petch', sans-serif;
-          font-size: 16px;
+          font-size: 18px;
           font-weight: 800;
           color: #0f172a;
           margin-top: 4px;
           display: block;
         }
         .warning-box {
-          border: 1px dashed #475569;
+          border: 1.5px dashed #475569;
           background: #f8fafc;
           border-radius: 12px;
-          padding: 14px;
-          font-size: 12px;
+          padding: 14px 18px;
+          font-size: 13px;
           line-height: 1.5;
           margin-bottom: 20px;
         }
         .footer-skills {
-          border-top: 1px solid #cbd5e1;
+          border-top: 2px solid #cbd5e1;
           padding-top: 14px;
           text-align: center;
           font-family: 'Chakra Petch', sans-serif;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 700;
-          color: #334155;
+          color: #0f172a;
         }
       </style>
     </head>
@@ -597,36 +612,38 @@ document.getElementById('btn-print').addEventListener('click', () => {
       <div class="diploma-box">
         <div class="header">
           <div class="header-left">
-            <div class="badge-6e">6<sup style="font-size:12px;margin-left:2px;">e</sup></div>
+            <div class="badge-6e">6<sup style="font-size:13px;margin-left:2px;">e</sup></div>
             <div>
-              <h1 class="title-main">Collège &bull; Liaison Primaire</h1>
-              <p class="title-sub">Brevet d'Aptitude Numérique — Déclic 6e</p>
+              <h1 class="title-main">Brevet d'Aptitude Numérique</h1>
+              <p class="title-sub">Liaison École Primaire &bull; Collège — Opération Déclic 6e</p>
             </div>
           </div>
           <div class="promo-pill">${promo}</div>
         </div>
 
-        <div class="student-block">
-          <span class="label-upper">Élève titulaire :</span>
-          <div class="student-name">${nom}</div>
-        </div>
+        <div class="identity-row">
+          <div class="student-block">
+            <span class="label-upper">Élève titulaire :</span>
+            <div class="student-name">${nom}</div>
+          </div>
 
-        <div class="matricule-box">
-          <span class="label-upper">Format type d'identifiant collège (Simulation) :</span>
-          <div class="matricule-code">${matricule}</div>
+          <div class="matricule-box">
+            <span class="label-upper">Format d'identifiant (Simulation) :</span>
+            <div class="matricule-code">${matricule}</div>
+          </div>
         </div>
 
         <div class="stats-grid">
           <div>
-            <span class="label-upper" style="font-size:10px;">Temps Niveau 1</span>
+            <span class="label-upper" style="font-size:11px;">Temps de Mission (Niveau 1)</span>
             <span class="stat-val">${temps}</span>
           </div>
           <div>
-            <span class="label-upper" style="font-size:10px;">Maîtrise Clavier</span>
+            <span class="label-upper" style="font-size:11px;">Maîtrise Clavier & Souris</span>
             <span class="stat-val">${rang}</span>
           </div>
           <div>
-            <span class="label-upper" style="font-size:10px;">Défi Alerte Cyber (Niv. 2)</span>
+            <span class="label-upper" style="font-size:11px;">Défi Alerte Cyber (Niveau 2)</span>
             <span class="stat-val">${cyber}</span>
           </div>
         </div>
@@ -639,7 +656,7 @@ document.getElementById('btn-print').addEventListener('click', () => {
         </div>
 
         <div class="footer-skills">
-          Compétences attestées : Double-clic &bull; Touche Shift &bull; Chiffres &bull; Écriture sans cadenas &bull; Sécurité 12 caractères
+          Compétences validées : Double-clic &bull; Touche Shift &bull; Saisie de chiffres &bull; Écriture sans cadenas &bull; Sécurité 12 caractères
         </div>
       </div>
 
