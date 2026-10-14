@@ -38,3 +38,81 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
+
+/* ========================================================= */
+/* IMPRESSION DU BREVET EN A4 PAYSAGE (SANS FENÊTRE POPUP)   */
+/* ========================================================= */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Masque tous les éléments d'interface + badge Netlify */
+  header,
+  footer,
+  .no-print,
+  #caps-lock-warning,
+  #modal-briefing,
+  #phase-0,
+  #phase-1,
+  #phase-2,
+  #phase-lvl2,
+  iframe,
+  div[style*="z-index: 2147483647"] {
+    display: none !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #phase-3 {
+    display: block !important;
+    margin: 0 !important;
+  }
+
+  #diploma-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    border: 5px double #0f172a !important;
+    border-radius: 20px !important;
+    padding: 28px 40px !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    page-break-inside: avoid;
+  }
+
+  /* Force le texte en noir parfaitement lisible sur papier */
+  #diploma-card h3,
+  #diploma-card p,
+  #diploma-card span,
+  #diploma-card strong,
+  #diploma-card div {
+    color: #0f172a !important;
+    background-color: transparent !important;
+  }
+
+  #diploma-card .badge-border,
+  #diploma-card .border,
+  #diploma-card .border-b,
+  #diploma-card .border-t {
+    border-color: #94a3b8 !important;
+  }
+}
