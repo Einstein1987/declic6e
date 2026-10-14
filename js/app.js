@@ -424,8 +424,240 @@ btnValiderPorte.addEventListener('click', () => {
   }, 1000);
 });
 
-// Impression et Recommencer
-document.getElementById('btn-print').addEventListener('click', () => window.print());
+// Impression du brevet
+document.getElementById('btn-print').addEventListener('click', () => {
+  const nom = document.getElementById('diploma-nom').textContent.trim();
+  const matricule = document.getElementById('diploma-matricule').textContent.trim();
+  const promo = document.getElementById('diploma-promo').textContent.trim();
+  const temps = document.getElementById('diploma-time').textContent.trim();
+  const rang = document.getElementById('diploma-rank').textContent.trim();
+  const cyber = document.getElementById('diploma-cyber-status').textContent.trim();
+
+  // Ouverture d'une fenêtre d'impression vierge dédiée uniquement au diplôme
+  const printWindow = window.open('', '_blank', 'width=850,height=650');
+  
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="UTF-8">
+      <title>Brevet d'Aptitude Numérique - ${nom}</title>
+      <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800&family=JetBrains+Mono:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+      <style>
+        @page {
+          size: A4 portrait;
+          margin: 15mm;
+        }
+        * {
+          box-sizing: border-box;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+        body {
+          font-family: 'Inter', sans-serif;
+          background: #ffffff;
+          color: #0f172a;
+          margin: 0;
+          padding: 20px;
+          display: flex;
+          justify-content: center;
+        }
+        .diploma-box {
+          width: 100%;
+          max-width: 720px;
+          border: 4px double #0f172a;
+          border-radius: 24px;
+          padding: 36px;
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 2px solid #cbd5e1;
+          padding-bottom: 18px;
+          margin-bottom: 24px;
+        }
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+        .badge-6e {
+          width: 52px;
+          height: 52px;
+          border: 2px solid #0f172a;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Chakra Petch', sans-serif;
+          font-weight: 800;
+          font-size: 22px;
+          background: #f1f5f9;
+        }
+        .title-main {
+          font-family: 'Chakra Petch', sans-serif;
+          font-size: 20px;
+          font-weight: 800;
+          text-transform: uppercase;
+          margin: 0;
+        }
+        .title-sub {
+          font-family: 'Chakra Petch', sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          color: #334155;
+          margin: 2px 0 0 0;
+        }
+        .promo-pill {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 13px;
+          font-weight: 700;
+          border: 2px solid #0f172a;
+          padding: 6px 12px;
+          border-radius: 8px;
+          background: #f8fafc;
+        }
+        .student-block {
+          text-align: center;
+          margin: 24px 0;
+        }
+        .label-upper {
+          font-family: 'Chakra Petch', sans-serif;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          color: #475569;
+          display: block;
+          margin-bottom: 6px;
+          font-weight: 700;
+        }
+        .student-name {
+          font-family: 'Chakra Petch', sans-serif;
+          font-size: 32px;
+          font-weight: 800;
+          text-transform: uppercase;
+          color: #0f172a;
+        }
+        .matricule-box {
+          border: 2px solid #0f172a;
+          background: #f8fafc;
+          border-radius: 14px;
+          padding: 16px;
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        .matricule-code {
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 26px;
+          font-weight: 700;
+          letter-spacing: 2px;
+          color: #0f172a;
+        }
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          border: 1px solid #94a3b8;
+          border-radius: 14px;
+          padding: 14px;
+          text-align: center;
+          margin-bottom: 20px;
+          background: #ffffff;
+        }
+        .stat-val {
+          font-family: 'Chakra Petch', sans-serif;
+          font-size: 16px;
+          font-weight: 800;
+          color: #0f172a;
+          margin-top: 4px;
+          display: block;
+        }
+        .warning-box {
+          border: 1px dashed #475569;
+          background: #f8fafc;
+          border-radius: 12px;
+          padding: 14px;
+          font-size: 12px;
+          line-height: 1.5;
+          margin-bottom: 20px;
+        }
+        .footer-skills {
+          border-top: 1px solid #cbd5e1;
+          padding-top: 14px;
+          text-align: center;
+          font-family: 'Chakra Petch', sans-serif;
+          font-size: 12px;
+          font-weight: 700;
+          color: #334155;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="diploma-box">
+        <div class="header">
+          <div class="header-left">
+            <div class="badge-6e">6<sup style="font-size:12px;margin-left:2px;">e</sup></div>
+            <div>
+              <h1 class="title-main">Collège &bull; Liaison Primaire</h1>
+              <p class="title-sub">Brevet d'Aptitude Numérique — Déclic 6e</p>
+            </div>
+          </div>
+          <div class="promo-pill">${promo}</div>
+        </div>
+
+        <div class="student-block">
+          <span class="label-upper">Élève titulaire :</span>
+          <div class="student-name">${nom}</div>
+        </div>
+
+        <div class="matricule-box">
+          <span class="label-upper">Format type d'identifiant collège (Simulation) :</span>
+          <div class="matricule-code">${matricule}</div>
+        </div>
+
+        <div class="stats-grid">
+          <div>
+            <span class="label-upper" style="font-size:10px;">Temps Niveau 1</span>
+            <span class="stat-val">${temps}</span>
+          </div>
+          <div>
+            <span class="label-upper" style="font-size:10px;">Maîtrise Clavier</span>
+            <span class="stat-val">${rang}</span>
+          </div>
+          <div>
+            <span class="label-upper" style="font-size:10px;">Défi Alerte Cyber (Niv. 2)</span>
+            <span class="stat-val">${cyber}</span>
+          </div>
+        </div>
+
+        <div class="warning-box">
+          <strong style="display:block;margin-bottom:4px;font-family:'Chakra Petch',sans-serif;text-transform:uppercase;">
+            ⚠️ Information importante pour la rentrée de septembre :
+          </strong>
+          Ce matricule était un entraînement technique. Tes véritables identifiants officiels pour te connecter aux ordinateurs et à l'ENT du collège te seront remis à la rentrée.
+        </div>
+
+        <div class="footer-skills">
+          Compétences attestées : Double-clic &bull; Touche Shift &bull; Chiffres &bull; Écriture sans cadenas &bull; Sécurité 12 caractères
+        </div>
+      </div>
+
+      <script>
+        window.onload = function() {
+          setTimeout(function() {
+            window.print();
+            window.close();
+          }, 300);
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+});
+
+//Bouton recommencer
 document.getElementById('btn-restart').addEventListener('click', () => window.location.reload());
 
 // ----------------------------------------------------
