@@ -1,4 +1,4 @@
-# 🚀 Déclic 6e — Liaison École-Collège & Défi Alerte Cyber
+# 🚀 Déclic 6e — Liaison École-Collège
 
 [![Licence : GNU AGPL v3.0](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![RGPD : Zéro donnée saisie collectée](https://img.shields.io/badge/RGPD-Z%C3%A9ro_saisie_collect%C3%A9e-emerald.svg)](#confidentialité--rgpd)
