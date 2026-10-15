@@ -339,8 +339,8 @@ const lockSpecial = document.getElementById('lock-special');
 
 const modelesIdees = [
   { texte: "Phrase : « J'aime la physique et la chimie en 6e ! » — Recopie les initiales :", code: "J'alpelce6e!" },
-  { texte: "Phrase : « Mon chien Rex court très vite à 18h ! » — Recopie les initiales :", code: "McRctvà18h!+" },
-  { texte: "Phrase : « Vive les grandes vacances d'été en 2027 ! » — Recopie les initiales :", code: "Vlgvd'ée2027!" }
+  { texte: "Phrase : « Je fais de la physique tous les jours à 16h ! » — Recopie les initiales :", code: "Jfdlptljà16h!" },
+  { texte: "Phrase : « Moncollège ouvre à 8h et ferme à 17h ! » — Recopie les initiales :", code: "Mcoà8hefà17h!" }
 ];
 let ideeIndex = 0;
 
