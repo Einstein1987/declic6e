@@ -47,7 +47,7 @@ const cases = [
     lesson: "RÈGLE D'OR : Ne colle JAMAIS tes codes sur un papier. N'importe qui peut s'en servir pour se connecter à ta place !",
     evidenceHtml: `
       <div class="p-4 bg-amber-200 text-slate-950 font-sans rounded-xl shadow-lg border-2 border-amber-400 rotate-1 max-w-xs shrink-0 space-y-1.5">
-        <span class="text-[11px] font-bold text-amber-800 uppercase tracking-wider block border-b border-amber-400/60 pb-1">
+        <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block border-b border-amber-400/60 pb-1">
           📌 Post-it collé sur l'écran
         </span>
         <div class="text-xs">
