@@ -2,9 +2,14 @@
 class SoundEngine {
   constructor() {
     this.ctx = null;
+    this.muted = false; // Permet de couper le son en classe
   }
 
   init() {
+    toggleMute() {
+    this.muted = !this.muted;
+    return this.muted;
+  }
     if (!this.ctx) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AudioContext();
@@ -15,6 +20,7 @@ class SoundEngine {
   }
 
   playClick() {
+    if (this.muted) return;
     this.init();
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -29,6 +35,7 @@ class SoundEngine {
   }
 
   playDoubleSuccess() {
+    if (this.muted) return;
     this.init();
     const now = this.ctx.currentTime;
     [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
@@ -46,6 +53,7 @@ class SoundEngine {
   }
 
   playWarning() {
+    if (this.muted) return;
     this.init();
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
@@ -62,6 +70,7 @@ class SoundEngine {
   }
 
   playLockTick() {
+    if (this.muted) return;
     this.init();
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -76,6 +85,7 @@ class SoundEngine {
   }
 
   playVaultUnlock() {
+    if (this.muted) return;
     this.init();
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
