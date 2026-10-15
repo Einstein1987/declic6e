@@ -36,6 +36,17 @@ function stopMissionTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
   }
+const btnMuteAudio = document.getElementById('btn-mute-audio');
+if (btnMuteAudio) {
+  btnMuteAudio.addEventListener('click', () => {
+    if (!window.audio) return;
+    const isMuted = window.audio.toggleMute();
+    document.getElementById('mute-icon').textContent = isMuted ? '🔇' : '🔊';
+    document.getElementById('mute-label').textContent = isMuted ? 'Muet' : 'Son';
+    btnMuteAudio.classList.toggle('text-slate-500', isMuted);
+    btnMuteAudio.classList.toggle('text-cyan-300', !isMuted);
+  });
+}
 }
 
 // ----------------------------------------------------
@@ -223,10 +234,14 @@ btnBack1a.addEventListener('click', () => {
   inputPrenom.focus();
 });
 
+let previousIdValue = '';
+
 inputSaisieId.addEventListener('input', () => {
   if (window.audio) window.audio.playClick();
   const value = inputSaisieId.value;
   const target = state.targetIdentifiant;
+  const isDeleting = value.length < previousIdValue.length;
+  previousIdValue = value;
 
   if (value === target) {
     inputSaisieId.className = "w-full bg-slate-950 border-2 border-emerald-500 rounded-xl px-5 py-4 text-2xl font-code tracking-widest text-emerald-300 focus:outline-none glow-green";
@@ -240,13 +255,16 @@ inputSaisieId.addEventListener('input', () => {
     statusIconId.innerHTML = `<svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`;
     btnValiderId.disabled = true;
   } else {
-    missionScore = Math.max(200, missionScore - 15);
+    // On ne retire des points que si l'élève vient d'ajouter une mauvaise lettre (pas quand il efface !)
+    if (!isDeleting) {
+      missionScore = Math.max(200, missionScore - 15);
+      if (window.audio) window.audio.playWarning();
+    }
     inputSaisieId.className = "w-full bg-slate-950 border-2 border-red-500 rounded-xl px-5 py-4 text-2xl font-code tracking-widest text-red-300 focus:outline-none glow-red";
     let expl = "Attention, une touche est incorrecte !";
     if (/[A-Z]/.test(value)) expl = "Pas de majuscule ! Éteins le cadenas [Verr Maj].";
     feedbackId.innerHTML = `<span class="text-red-400 font-bold">⚠️ ${expl} Efface et réessaie.</span>`;
     btnValiderId.disabled = true;
-    if (window.audio) window.audio.playWarning();
   }
 });
 
