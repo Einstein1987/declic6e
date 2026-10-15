@@ -160,6 +160,13 @@ folderTrigger.addEventListener('click', () => {
 
 folderTrigger.addEventListener('dblclick', unlockPhase0);
 
+folderTrigger.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    unlockPhase0();
+  }
+});
+
 // ----------------------------------------------------
 // ÉTAPE 1 : IDENTIFIANT ÉLÈVE
 // ----------------------------------------------------
