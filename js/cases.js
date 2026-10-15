@@ -24,7 +24,7 @@ const chosenPet = pickRandom(maximeAnimals);
 const petNameClean = chosenPet.name.charAt(0).toUpperCase() + chosenPet.name.slice(1);
 const maximePwd = `${chosenPet.prefix}${petNameClean}${window.promoYear}!`;
 
-// 3. Génération aléatoire pour Karim (Crié en classe, sans point d'exclamation de fin de phrase)
+// 3. Génération aléatoire pour Karim
 const karimCodes = [
   'CollegeSecret!26',
   'SuperCalcul!45',
