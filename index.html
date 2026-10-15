@@ -67,7 +67,7 @@
     </div>
     
     <div class="flex items-center gap-4">
-      <div class="flex items-center gap-2 font-hud text-xs md:text-sm">
+      <div class="hidden md:flex items-center gap-2 font-hud text-xs md:text-sm">
         <span id="step-pill-0" class="px-3 py-1 rounded bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold">0. Sas</span>
         <span class="text-slate-600">&rarr;</span>
         <span id="step-pill-1" class="px-3 py-1 rounded bg-slate-900 border border-slate-800 text-slate-400 font-bold">1. Identifiant</span>
@@ -302,9 +302,9 @@
           <h4 class="font-hud font-bold text-purple-200 text-sm uppercase">Comment créer au moins 12 caractères sans jamais les oublier ?</h4>
           <p class="text-xs text-slate-300 leading-relaxed">
             Pense à une phrase : <strong class="text-purple-300">« J'aime la physique et la chimie en 6e ! »</strong><br>
-            Prends la 1ère lettre de chaque mot, les chiffres et la ponctuation <strong>sans aucun espace</strong> : 
+            Prends la 1ère lettre de chaque mot (<em>« J'aime » compte pour deux : <strong class="text-yellow-300">J'</strong> et <strong class="text-yellow-300">a</strong> ; les nombres comme <strong class="text-yellow-300">6e</strong> restent entiers</em>) et colle tout <strong>sans espace</strong> :            <span class="font-code font-bold bg-slate-950 px-2 py-0.5 rounded text-yellow-300">J'alpelce6e!</span>
             <span class="font-code font-bold bg-slate-950 px-2 py-0.5 rounded text-yellow-300">J'alpelce6e!</span>
-            &rarr; <span class="text-emerald-400 font-bold">12 caractères pile, faciles à retenir et incassables !</span>
+            &rarr;<span class="text-emerald-400 font-bold">12 caractères pile, faciles à retenir et incassables !</span>
           </p>
           <div class="pt-2 flex items-center justify-between">
             <span class="text-xs text-slate-400">Tu manques d'inspiration ?</span>
@@ -668,7 +668,7 @@
           Confidentialité & RGPD
         </summary>
         <p class="mt-2 p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs text-slate-300 max-w-lg mx-auto leading-relaxed">
-          <strong>Respect du RGPD (Zéro collecte de données) :</strong> Tous les traitements liés aux élèves (prénom, nom, mots de passe d'entraînement, scores) sont exécutés localement dans le navigateur. Aucune donnée personnelle saisie n'est envoyée sur Internet ni enregistrée dans une base de données.
+          <strong>Respect du RGPD (Zéro collecte de données) :</strong> Tous les traitements pédagogiques (prénom, nom, mots de passe d'entraînement, scores) s'exécutent uniquement dans la mémoire locale du navigateur. Aucune donnée saisie par l'élève n'est transmise ni stockée sur un serveur (seules les polices d'écriture et la feuille de style Tailwind sont chargées via CDN)
         </p>
       </details>
 
@@ -677,7 +677,7 @@
         <span>
           Développé par <strong class="text-white font-semibold">Jérémy VIOLETTE</strong>
           &bull;
-          <a href="LICENSE" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">
+          <a href="https://github.com/Einstein1987/declic6e/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">
             Licence GNU AGPL v3.0
           </a>
           &bull;
