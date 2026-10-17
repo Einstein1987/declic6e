@@ -226,6 +226,7 @@ btnValiderNom.addEventListener('click', () => {
   sub1a.classList.add('hidden');
   sub1b.classList.remove('hidden');
   inputSaisieId.value = '';
+  previousIdValue = '';
   inputSaisieId.focus();
 });
 
