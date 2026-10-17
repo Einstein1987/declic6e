@@ -77,14 +77,27 @@ function typeWriter() {
   }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', typeWriter);
-} else {
+// Les navigateurs interdisent tout son tant que l'élève n'a pas fait une première action (clic ou touche).
+// On affiche donc une invite : l'animation, avec ses bruitages, démarre à la première interaction.
+let briefingStarted = false;
+
+function startBriefing() {
+  if (briefingStarted) return;
+  briefingStarted = true;
+  if (window.audio) window.audio.init(); // activation du son, autorisée car déclenchée par une action de l'élève
+  typewriterBox.textContent = '';
   typeWriter();
+}
+
+if (typewriterBox && modalBriefing) {
+  typewriterBox.textContent = "▶ Clique n'importe où ou appuie sur une touche pour établir la connexion...";
+  modalBriefing.addEventListener('click', startBriefing);
+  window.addEventListener('keydown', startBriefing);
 }
 
 if (btnStartMission) {
   btnStartMission.addEventListener('click', () => {
+    briefingStarted = true;
     if (typingTimeout) clearTimeout(typingTimeout);
     if (window.audio) window.audio.playDoubleSuccess();
     modalBriefing.classList.add('hidden');
