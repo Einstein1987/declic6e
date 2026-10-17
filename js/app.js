@@ -36,6 +36,8 @@ function stopMissionTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
   }
+}
+
 const btnMuteAudio = document.getElementById('btn-mute-audio');
 if (btnMuteAudio) {
   btnMuteAudio.addEventListener('click', () => {
@@ -46,7 +48,6 @@ if (btnMuteAudio) {
     btnMuteAudio.classList.toggle('text-slate-500', isMuted);
     btnMuteAudio.classList.toggle('text-cyan-300', !isMuted);
   });
-}
 }
 
 // ----------------------------------------------------
