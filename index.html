@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;800&family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   
-  <!-- Styles personnalisés (bien nommé style.css) -->
+  <!-- Styles personnalisés -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
@@ -27,7 +27,7 @@
         <span class="text-xs font-code text-slate-400">[PRIORITÉ HAUTE]</span>
       </div>
 
-      <!-- Étape A : Bouton pour débloquer l'audio du navigateur et lancer le télétype avec le son -->
+      <!-- Étape A : Bouton pour débloquer l'audio du navigateur et lancer le télétype -->
       <div id="briefing-init-box" class="bg-slate-950 border border-slate-800 rounded-xl p-8 text-center space-y-4">
         <p class="text-xs font-code text-slate-400">Transmission entrante détectée sur le terminal...</p>
         <button type="button" id="btn-init-transmission"
@@ -37,8 +37,9 @@
       </div>
 
       <!-- Étape B : Texte animé avec bips sonores -->
-      <div id="typewriter-text" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-5 min-h-[140px] font-code text-sm text-cyan-300 leading-relaxed whitespace-pre-line typing-cursor"></div>
+      <div id="typewriter-text" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-5 min-h-[150px] font-code text-sm text-cyan-300 leading-relaxed whitespace-pre-line typing-cursor"></div>
 
+      <!-- Étape C : Bouton pour lancer la mission -->
       <div id="briefing-start-container" class="hidden flex justify-end pt-2">
         <button type="button" id="btn-start-mission" 
                 class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-hud font-bold px-6 py-3 rounded-xl transition duration-200 flex items-center gap-2 glow-cyan text-sm">
@@ -50,6 +51,7 @@
       </div>
     </div>
   </div>
+
   <!-- Bannière d'alerte Cadenas Majuscule -->
   <div id="caps-lock-warning" role="alert" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden transition-all duration-300 no-print">
     <div class="bg-red-600 text-white px-6 py-3 rounded-full font-hud font-bold tracking-wide flex items-center gap-3 glow-red border-2 border-red-300 animate-bounce text-sm">
@@ -75,7 +77,7 @@
       </h1>
     </div>
     
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3 md:gap-4">
       <div class="hidden md:flex items-center gap-2 font-hud text-xs md:text-sm">
         <span id="step-pill-0" class="px-3 py-1 rounded bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold">0. Sas</span>
         <span class="text-slate-600">&rarr;</span>
@@ -91,6 +93,7 @@
         <span>TEMPS :</span>
         <span id="hud-timer" class="font-bold text-cyan-300">00:00</span>
       </div>
+
       <button type="button" id="btn-mute-audio" title="Activer / Couper les effets sonores"
               class="flex items-center gap-1.5 font-hud text-xs bg-slate-950 hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-lg text-cyan-300 transition">
         <span id="mute-icon">🔊</span>
@@ -316,9 +319,9 @@
           <h4 class="font-hud font-bold text-purple-200 text-sm uppercase">Comment créer au moins 12 caractères sans jamais les oublier ?</h4>
           <p class="text-xs text-slate-300 leading-relaxed">
             Pense à une phrase : <strong class="text-purple-300">« J'aime la physique et la chimie en 6e ! »</strong><br>
-            Prends la 1ère lettre de chaque mot (<em>« J'aime » compte pour deux : <strong class="text-yellow-300">J'</strong> et <strong class="text-yellow-300">a</strong> ; les nombres comme <strong class="text-yellow-300">6e</strong> restent entiers</em>) et colle tout <strong>sans espace</strong> :            <span class="font-code font-bold bg-slate-950 px-2 py-0.5 rounded text-yellow-300">J'alpelce6e!</span>
+            Prends la 1ère lettre de chaque mot (<em>« J'aime » compte pour deux : <strong class="text-yellow-300">J'</strong> et <strong class="text-yellow-300">a</strong> ; les nombres comme <strong class="text-yellow-300">6e</strong> restent entiers</em>) et colle tout <strong>sans espace</strong> : 
             <span class="font-code font-bold bg-slate-950 px-2 py-0.5 rounded text-yellow-300">J'alpelce6e!</span>
-            &rarr;<span class="text-emerald-400 font-bold">12 caractères pile, faciles à retenir et incassables !</span>
+            &rarr; <span class="text-emerald-400 font-bold">12 caractères pile, faciles à retenir et incassables !</span>
           </p>
           <div class="pt-2 flex items-center justify-between">
             <span class="text-xs text-slate-400">Tu manques d'inspiration ?</span>
@@ -362,7 +365,7 @@
           </div>
         </div>
 
-        <!-- Les 5 Verrous (Longueur + Majuscule + Minuscule + Chiffre + Spécial) -->
+        <!-- Les 5 Verrous -->
         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
           <div id="lock-len" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex items-center gap-2">
             <div class="w-3.5 h-3.5 rounded-full border-2 border-slate-600 shrink-0 status-dot"></div>
@@ -410,7 +413,6 @@
         </p>
       </div>
 
-      <!-- Le Brevet formaté pour l'écran ET l'impression A4 Paysage directe -->
       <div id="diploma-card" class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-cyan-500/60 rounded-3xl p-8 max-w-3xl mx-auto shadow-2xl glow-cyan space-y-5 relative overflow-hidden">
         
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 badge-border">
@@ -682,7 +684,7 @@
           Confidentialité & RGPD
         </summary>
         <p class="mt-2 p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs text-slate-300 max-w-lg mx-auto leading-relaxed">
-          <strong>Respect du RGPD (Zéro collecte de données) :</strong> Tous les traitements pédagogiques (prénom, nom, mots de passe d'entraînement, scores) s'exécutent uniquement dans la mémoire locale du navigateur. Aucune donnée saisie par l'élève n'est transmise ni stockée sur un serveur (seules les polices d'écriture et la feuille de style Tailwind sont chargées via CDN)
+          <strong>Respect du RGPD (Zéro collecte des saisies) :</strong> Tous les traitements pédagogiques (prénom, nom, mots de passe d'entraînement, scores) s'exécutent uniquement dans la mémoire locale du navigateur. Aucune donnée saisie par l'élève n'est transmise ni stockée sur un serveur (seules les polices d'écriture et la feuille de style Tailwind sont chargées via CDN).
         </p>
       </details>
 
