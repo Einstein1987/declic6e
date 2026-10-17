@@ -27,9 +27,19 @@
         <span class="text-xs font-code text-slate-400">[PRIORITÉ HAUTE]</span>
       </div>
 
-      <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 min-h-[140px] font-code text-sm text-cyan-300 leading-relaxed whitespace-pre-line typing-cursor" id="typewriter-text"></div>
+      <!-- Étape A : Bouton pour débloquer l'audio du navigateur et lancer le télétype avec le son -->
+      <div id="briefing-init-box" class="bg-slate-950 border border-slate-800 rounded-xl p-8 text-center space-y-4">
+        <p class="text-xs font-code text-slate-400">Transmission entrante détectée sur le terminal...</p>
+        <button type="button" id="btn-init-transmission"
+                class="bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border-2 border-cyan-500 font-hud font-bold px-6 py-3 rounded-xl transition duration-200 inline-flex items-center gap-2 glow-cyan animate-pulse text-sm">
+          <span>📡 Établir la liaison audio & lire le message</span>
+        </button>
+      </div>
 
-      <div class="flex justify-end pt-2">
+      <!-- Étape B : Texte animé avec bips sonores -->
+      <div id="typewriter-text" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-5 min-h-[140px] font-code text-sm text-cyan-300 leading-relaxed whitespace-pre-line typing-cursor"></div>
+
+      <div id="briefing-start-container" class="hidden flex justify-end pt-2">
         <button type="button" id="btn-start-mission" 
                 class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-hud font-bold px-6 py-3 rounded-xl transition duration-200 flex items-center gap-2 glow-cyan text-sm">
           <span>Commencer la mission</span>
@@ -40,7 +50,6 @@
       </div>
     </div>
   </div>
-
   <!-- Bannière d'alerte Cadenas Majuscule -->
   <div id="caps-lock-warning" role="alert" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden transition-all duration-300 no-print">
     <div class="bg-red-600 text-white px-6 py-3 rounded-full font-hud font-bold tracking-wide flex items-center gap-3 glow-red border-2 border-red-300 animate-bounce text-sm">
