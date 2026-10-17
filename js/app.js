@@ -2,6 +2,7 @@
 const nowDate = new Date();
 const promoYear = window.promoYear || ((nowDate.getMonth() + 1 >= 9) ? nowDate.getFullYear() + 1 : nowDate.getFullYear());
 const randomDynamicDigits = String(nowDate.getSeconds()).padStart(2, '0');
+const activeCases = window.cases || (typeof cases !== 'undefined' ? cases : []);
 
 const state = {
   prenom: '',
@@ -12,6 +13,24 @@ const state = {
   isCapsLocked: false,
   isShiftPressed: false
 };
+
+// ----------------------------------------------------
+// BOUTON SON / MUET DANS LE HEADER
+// ----------------------------------------------------
+const btnMuteAudio = document.getElementById('btn-mute-audio');
+if (btnMuteAudio) {
+  btnMuteAudio.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!window.audio) return;
+    const isMuted = window.audio.toggleMute();
+    const muteIcon = document.getElementById('mute-icon');
+    const muteLabel = document.getElementById('mute-label');
+    if (muteIcon) muteIcon.textContent = isMuted ? '🔇' : '🔊';
+    if (muteLabel) muteLabel.textContent = isMuted ? 'Muet' : 'Son';
+    btnMuteAudio.classList.toggle('text-slate-500', isMuted);
+    btnMuteAudio.classList.toggle('text-cyan-300', !isMuted);
+  });
+}
 
 // ----------------------------------------------------
 // GESTION DU CHRONOMÈTRE ET DU SCORE DE PRÉCISION
@@ -38,24 +57,15 @@ function stopMissionTimer() {
   }
 }
 
-const btnMuteAudio = document.getElementById('btn-mute-audio');
-if (btnMuteAudio) {
-  btnMuteAudio.addEventListener('click', () => {
-    if (!window.audio) return;
-    const isMuted = window.audio.toggleMute();
-    document.getElementById('mute-icon').textContent = isMuted ? '🔇' : '🔊';
-    document.getElementById('mute-label').textContent = isMuted ? 'Muet' : 'Son';
-    btnMuteAudio.classList.toggle('text-slate-500', isMuted);
-    btnMuteAudio.classList.toggle('text-cyan-300', !isMuted);
-  });
-}
-
 // ----------------------------------------------------
-// ANIMATION DU BRIEFING DÉPART (TYPEWRITER)
+// ANIMATION DU BRIEFING DÉPART AVEC SON TÉLÉTYPE
 // ----------------------------------------------------
 const briefingMessage = "TRANSMISSION CRYPTÉE...\n\nRecrue de CM2 détectée. Ta mission : infiltrer les terminaux du collège, maîtriser ton clavier sans bloquer le cadenas et forger ton habilitation sécurisée.\n\n⚠️ Règle n°1 d'un bon agent : LIS BIEN LES CONSIGNES à chaque étape !\n\nPremière épreuve : forcer le sas d'entrée par double-clic.";
 
+const briefingInitBox = document.getElementById('briefing-init-box');
+const btnInitTransmission = document.getElementById('btn-init-transmission');
 const typewriterBox = document.getElementById('typewriter-text');
+const briefingStartContainer = document.getElementById('briefing-start-container');
 const btnStartMission = document.getElementById('btn-start-mission');
 const modalBriefing = document.getElementById('modal-briefing');
 
@@ -68,39 +78,42 @@ function typeWriter() {
     const char = briefingMessage.charAt(charIndex);
     typewriterBox.textContent += char;
     charIndex++;
-    if (char !== ' ' && char !== '\n' && window.audio && window.audio.ctx) {
-      window.audio.playClick();
+    // Bip sonore toutes les 2 lettres (compatible avec playType ou playClick)
+    if (char !== ' ' && char !== '\n' && charIndex % 2 === 0 && window.audio) {
+      if (typeof window.audio.playType === 'function') {
+        window.audio.playType();
+      } else {
+        window.audio.playClick();
+      }
     }
-    typingTimeout = setTimeout(typeWriter, char === '\n' ? 250 : 25);
+    typingTimeout = setTimeout(typeWriter, char === '\n' ? 220 : 25);
   } else {
     typewriterBox.classList.remove('typing-cursor');
   }
 }
 
-// Les navigateurs interdisent tout son tant que l'élève n'a pas fait une première action (clic ou touche).
-// On affiche donc une invite : l'animation, avec ses bruitages, démarre à la première interaction.
-let briefingStarted = false;
-
-function startBriefing() {
-  if (briefingStarted) return;
-  briefingStarted = true;
-  if (window.audio) window.audio.init(); // activation du son, autorisée car déclenchée par une action de l'élève
-  typewriterBox.textContent = '';
-  typeWriter();
-}
-
-if (typewriterBox && modalBriefing) {
-  typewriterBox.textContent = "▶ Clique n'importe où ou appuie sur une touche pour établir la connexion...";
-  modalBriefing.addEventListener('click', startBriefing);
-  window.addEventListener('keydown', startBriefing);
+// Lorsque l'élève clique sur "Établir la liaison audio & lire le message"
+if (btnInitTransmission) {
+  btnInitTransmission.addEventListener('click', () => {
+    if (window.audio) window.audio.init();
+    if (briefingInitBox) briefingInitBox.classList.add('hidden');
+    if (typewriterBox) {
+      typewriterBox.textContent = '';
+      typewriterBox.classList.remove('hidden');
+      typewriterBox.classList.add('typing-cursor');
+    }
+    if (briefingStartContainer) briefingStartContainer.classList.remove('hidden');
+    charIndex = 0;
+    if (typingTimeout) clearTimeout(typingTimeout);
+    typeWriter();
+  });
 }
 
 if (btnStartMission) {
   btnStartMission.addEventListener('click', () => {
-    briefingStarted = true;
     if (typingTimeout) clearTimeout(typingTimeout);
     if (window.audio) window.audio.playDoubleSuccess();
-    modalBriefing.classList.add('hidden');
+    if (modalBriefing) modalBriefing.classList.add('hidden');
     startMissionTimer();
   });
 }
@@ -115,19 +128,21 @@ const footerCaps = document.getElementById('footer-caps-status');
 const footerShift = document.getElementById('footer-shift-status');
 
 function updateKeyboardIndicators(e) {
-  const isCaps = e.getModifierState && e.getModifierState('CapsLock');
-  if (isCaps !== state.isCapsLocked) {
-    state.isCapsLocked = isCaps;
-    if (state.isCapsLocked) {
-      missionScore = Math.max(200, missionScore - 25);
-      capsWarning.classList.remove('hidden');
-      footerCaps.className = "px-2.5 py-0.5 rounded bg-red-950 border border-red-600 text-red-400 font-bold animate-pulse";
-      footerCaps.textContent = "ACTIVÉ (DANGER)";
-      if (window.audio) window.audio.playWarning();
-    } else {
-      capsWarning.classList.add('hidden');
-      footerCaps.className = "px-2.5 py-0.5 rounded bg-emerald-950 border border-emerald-600 text-emerald-400 font-bold";
-      footerCaps.textContent = "Éteint (Correct)";
+  if (typeof e.getModifierState === 'function') {
+    const isCaps = Boolean(e.getModifierState('CapsLock'));
+    if (isCaps !== state.isCapsLocked) {
+      state.isCapsLocked = isCaps;
+      if (state.isCapsLocked) {
+        missionScore = Math.max(200, missionScore - 25);
+        capsWarning.classList.remove('hidden');
+        footerCaps.className = "px-2.5 py-0.5 rounded bg-red-950 border border-red-600 text-red-400 font-bold animate-pulse";
+        footerCaps.textContent = "ACTIVÉ (DANGER)";
+        if (window.audio) window.audio.playWarning();
+      } else {
+        capsWarning.classList.add('hidden');
+        footerCaps.className = "px-2.5 py-0.5 rounded bg-emerald-950 border border-emerald-600 text-emerald-400 font-bold";
+        footerCaps.textContent = "Éteint (Correct)";
+      }
     }
   }
 
@@ -213,6 +228,8 @@ const statusIconId = document.getElementById('identifiant-status-icon');
 const btnValiderId = document.getElementById('btn-valider-identifiant');
 const btnBack1a = document.getElementById('btn-back-1a');
 
+let previousIdValue = '';
+
 btnValiderNom.addEventListener('click', () => {
   const pClean = sanitizeForLogin(inputPrenom.value);
   const nClean = sanitizeForLogin(inputNom.value);
@@ -249,8 +266,6 @@ btnBack1a.addEventListener('click', () => {
   inputPrenom.focus();
 });
 
-let previousIdValue = '';
-
 inputSaisieId.addEventListener('input', () => {
   if (window.audio) window.audio.playClick();
   const value = inputSaisieId.value;
@@ -270,7 +285,6 @@ inputSaisieId.addEventListener('input', () => {
     statusIconId.innerHTML = `<svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`;
     btnValiderId.disabled = true;
   } else {
-    // On ne retire des points que si l'élève vient d'ajouter une mauvaise lettre (pas quand il efface !)
     if (!isDeleting) {
       missionScore = Math.max(200, missionScore - 15);
       if (window.audio) window.audio.playWarning();
@@ -307,7 +321,6 @@ const feedbackP2 = document.getElementById('feedback-p2');
 const boxP3 = document.getElementById('box-palier-3');
 const badgeP3 = document.getElementById('badge-p3');
 
-// Palier 1 : Vérifie que les chiffres sont tapés en maintenant Shift
 inputP1.addEventListener('keydown', (e) => {
   if (/^[0-9]$/.test(e.key) && (!e.shiftKey || (e.getModifierState && e.getModifierState('CapsLock')))) {
     e.preventDefault();
@@ -333,7 +346,6 @@ inputP1.addEventListener('input', () => {
   }
 });
 
-// Palier 2
 inputP2.addEventListener('input', () => {
   if (window.audio) window.audio.playClick();
   if (inputP2.value === "Agent!") {
@@ -562,7 +574,8 @@ if (btnBackToCases) {
 function openCase(index) {
   currentCaseIndex = index;
   currentCaseAttempts = 0;
-  const c = cases[index];
+  const c = activeCases[index];
+  if (!c) return;
 
   casesGridContainer.classList.add('hidden');
   casePanel.classList.remove('hidden');
@@ -578,19 +591,24 @@ function openCase(index) {
   lvl2InputId.focus();
 }
 
-cases.forEach((c, i) => {
-  document.getElementById(c.tabId).addEventListener('click', () => {
-    if (window.audio) window.audio.playClick();
-    openCase(i);
-  });
+activeCases.forEach((c, i) => {
+  const tabEl = document.getElementById(c.tabId);
+  if (tabEl) {
+    tabEl.addEventListener('click', () => {
+      if (window.audio) window.audio.playClick();
+      openCase(i);
+    });
+  }
 });
 
 if (btnCaseHint) {
   btnCaseHint.addEventListener('click', () => {
     if (window.audio) window.audio.playLockTick();
-    const activeCase = cases[currentCaseIndex];
-    caseHintBox.innerHTML = `💡 <strong>Indice :</strong> ${activeCase.hint}`;
-    caseHintBox.classList.remove('hidden');
+    const activeCase = activeCases[currentCaseIndex];
+    if (activeCase) {
+      caseHintBox.innerHTML = `💡 <strong>Indice :</strong> ${activeCase.hint}`;
+      caseHintBox.classList.remove('hidden');
+    }
   });
 }
 
@@ -600,7 +618,9 @@ const btnModalDisconnect = document.getElementById('btn-modal-disconnect');
 const legalLessonText = document.getElementById('legal-lesson-text');
 
 btnTestLogin.addEventListener('click', () => {
-  const activeCase = cases[currentCaseIndex];
+  const activeCase = activeCases[currentCaseIndex];
+  if (!activeCase) return;
+
   const typedId = lvl2InputId.value.trim().toLowerCase();
   const typedPwd = lvl2InputPwd.value.trim();
 
@@ -636,9 +656,11 @@ btnModalDisconnect.addEventListener('click', () => {
   modalLegal.classList.add('hidden');
 
   resolvedCases[currentCaseIndex] = true;
-  const badge = document.getElementById(cases[currentCaseIndex].badgeId);
-  badge.textContent = "Sécurisé ✅";
-  badge.className = "text-xs font-code px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500";
+  const badge = document.getElementById(activeCases[currentCaseIndex].badgeId);
+  if (badge) {
+    badge.textContent = "Sécurisé ✅";
+    badge.className = "text-xs font-code px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500";
+  }
 
   const totalResolved = resolvedCases.filter(Boolean).length;
   document.getElementById('lvl2-score-badge').textContent = `Défis résolus : ${totalResolved} / 3`;
@@ -653,3 +675,4 @@ btnModalDisconnect.addEventListener('click', () => {
     document.getElementById('lvl2-final-panel').classList.remove('hidden');
   }
 });
+// --- FIN DU FICHIER APP.JS ---
